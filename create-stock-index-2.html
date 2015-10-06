@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="canonical" href="http://dikekalu.com/create-stock-index-2.html" />
+
+    <title>  Dike E. Kalu &mdash; Create a stock index - Part 2
+</title>
+
+
+
+
+    <link rel="stylesheet" href="http://dikekalu.com/theme/css/style.css">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47236147-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <meta name="author" content="Dike Kalu">
+    <meta name="description" content="Create a stock index from scratch - Part 2">
+  <meta name="tags" contents="python, finance, api, ">
+</head>
+
+<body>
+<header class="header">
+  <div class="container">
+    <div class="header-inner">
+      <h1 class="header-name">
+        <a class="nodec" href="http://dikekalu.com">Dike E. Kalu</a>
+      </h1>
+      <h3 class="header-text">Software, Finance, Insurance, & Economics</h3>
+      <ul class="header-menu list-inline">
+          <li><a class="nodec" href="http://dikekalu.com/tags.html">Tags</a></li>
+          <li class="muted">|</li>
+          <li><a class="nodec icon-mail-alt" href="mailto:dike@dikekalu.com"></a></li>
+          <li><a class="nodec icon-github" href="https://github.com/dikee"></a></li>
+          <li><a class="nodec icon-twitter" href="https://twitter.com/dikekalu"></a></li>
+      </ul>
+    </div>
+  </div>
+</header> <!-- /.header -->  <div class="container">
+  <div class="post full-post">
+    <h1 class="post-title">
+      <a href="/create-stock-index-2.html" title="Permalink to Create a stock index - Part 2">Create a stock index - Part 2</a>
+    </h1>
+    <ul class="list-inline">
+      <li class="post-date">
+        <a class="text-muted" href="/create-stock-index-2.html" title="2015-10-05T00:00:00-04:00">Mon 05 October 2015</a>
+      </li>
+      <li class="muted">&middot;</li>
+      <li class="post-category">
+        <a href="http://dikekalu.com/category/python.html">Python</a>
+      </li>
+        <li class="muted">&middot;</li>
+        <li>
+            <a href="/tag/python.html">python</a>,             <a href="/tag/finance.html">finance</a>,             <a href="/tag/api.html">api</a>        </li>
+    </ul>
+    <div class="post-content">
+      <p>In the prior <a href="http://dikekalu.com/create-stock-index-1.html">post</a>, we created a script to compute a stock index made up of health care stocks. However, the script only prints out on the terminal. We have no avenue to save the computed stock indexes over time.</p>
+<p>In this post, we'll create a function to store the results in a file. The file will contain tuples of a date and the stock index.</p>
+<p>A made up representation is below.</p>
+<div class="highlight"><pre>(&#39;2015-10-06T02:28:22.854918&#39;, 2433)
+(&#39;2015-11-06T02:28:22.854918&#39;, 2412)
+(&#39;2015-12-06T02:28:22.854918&#39;, 2433)
+(&#39;2015-13-06T02:28:22.854918&#39;, 2441)
+(&#39;2015-14-06T02:28:22.854918&#39;, 2430)
+</pre></div>
+
+
+<p>Luckily for us, we can add this functionality easily. Simple add this function to the script in the last post.</p>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">save_index_to_file</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Save the calculated index to a file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">calculate_hgi_index</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="n">archive_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+    <span class="n">tuple_with_new_line</span> <span class="o">=</span> <span class="s">&quot;{0}{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">archive_tuple</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;archive.txt&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">the_file</span><span class="p">:</span>
+        <span class="n">the_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">tuple_with_new_line</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The first line calculates the index and assigns it to the <code>index</code> variable.</p>
+<p>The second line gets the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 formatted date</a>.</p>
+<p>Next, we create a tuple with the date and the index.</p>
+<p>Lastly we append a new line to the tuple and assign that to a variable called <code>tuple_with_new_line</code>.</p>
+<p>The last two lines creates/opens a file in append mode and writes the <code>tuple_with_new_line</code> variable.</p>
+<p>To implement this new function, change the <code>if __name__ == '__main__'</code> code block to call the new function.</p>
+<div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">save_index_to_file</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Running the file from the command line will now create or append the date and index data to a file called <code>archive.txt</code>.</p>
+<p>For reference, you can find the full python script <a href="https://gist.github.com/dikee/e4734b46d351638c3b35">here</a>.</p>
+    </div>
+  </div>
+  <hr class="separator">
+  <div class="col-md-8 col-md-offset-2">
+  </div>
+  </div>
+<footer class="footer">
+  <div class="container">
+    <p class="text-center">
+      Dike E. Kalu, <a href="" target="_blank"></a> unless otherwise noted.
+    </p>
+    <div class="text-center">
+      Generated by <a href="http://getpelican.com" target="_blank">Pelican</a> with the <a href="http://github.com/nairobilug/pelican-alchemy">alchemy</a> theme.
+    </div>
+  </div>
+</footer> <!-- /.footer -->
+  <script src="http://dikekalu.com/theme/js/jquery.min.js"></script>
+  <script src="http://dikekalu.com/theme/js/bootstrap.min.js"></script>
+</body> <!-- 42 -->
+
+</html>
