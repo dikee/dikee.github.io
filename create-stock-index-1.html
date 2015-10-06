@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="canonical" href="http://dikekalu.com/create-stock-index-1.html" />
+
+    <title>  Dike E. Kalu &mdash; Create a stock index
+</title>
+
+
+
+
+    <link rel="stylesheet" href="http://dikekalu.com/theme/css/style.css">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47236147-2', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+    <meta name="author" content="Dike Kalu">
+    <meta name="description" content="Create a stock index from scratch (using Python)">
+  <meta name="tags" contents="python, finance, api, requests, ">
+</head>
+
+<body>
+<header class="header">
+  <div class="container">
+    <div class="header-inner">
+      <h1 class="header-name">
+        <a class="nodec" href="http://dikekalu.com">Dike E. Kalu</a>
+      </h1>
+      <h3 class="header-text">Software, Finance, Insurance, & Economics</h3>
+      <ul class="header-menu list-inline">
+          <li><a class="nodec" href="http://dikekalu.com/tags.html">Tags</a></li>
+          <li class="muted">|</li>
+          <li><a class="nodec icon-mail-alt" href="mailto:dike@dikekalu.com"></a></li>
+          <li><a class="nodec icon-github" href="https://github.com/dikee"></a></li>
+          <li><a class="nodec icon-twitter" href="https://twitter.com/dikekalu"></a></li>
+      </ul>
+    </div>
+  </div>
+</header> <!-- /.header -->  <div class="container">
+  <div class="post full-post">
+    <h1 class="post-title">
+      <a href="/create-stock-index-1.html" title="Permalink to Create a stock index">Create a stock index</a>
+    </h1>
+    <ul class="list-inline">
+      <li class="post-date">
+        <a class="text-muted" href="/create-stock-index-1.html" title="2015-09-18T00:00:00-04:00">Fri 18 September 2015</a>
+      </li>
+      <li class="muted">&middot;</li>
+      <li class="post-category">
+        <a href="http://dikekalu.com/category/python.html">Python</a>
+      </li>
+        <li class="muted">&middot;</li>
+        <li>
+            <a href="/tag/python.html">python</a>,             <a href="/tag/finance.html">finance</a>,             <a href="/tag/api.html">api</a>,             <a href="/tag/requests.html">requests</a>        </li>
+    </ul>
+    <div class="post-content">
+      <p>You've been tracking the health care sector new reports and eventually come to the conclusion that health insurance stocks are going to perform well in the next few years due to the mandate issued by <a href="https://en.wikipedia.org/wiki/Patient_Protection_and_Affordable_Care_Act">ACA</a>.</p>
+<p>Lets further assume that you want to create a stock index that will allow you to track the performance of health insurance companies from day to day.</p>
+<p>This post will walk through step by step instructions on how you could create such an index. It is not meant to be financially thorough, but merely a vehicle to examine how Python can be used to perform quick and simple analysis such as this.</p>
+<h3>Lets get started</h3>
+<p>We need a name for the index. How about cliche name like "Health Growth Index" (or HGI).</p>
+<p>To begin with, we have to find some stocks that will make up HGI. Luckily, there is a <a href="https://en.wikipedia.org/wiki/List_of_S%26P_500_companies">wikipedia page</a> with a list of S&amp;P 500 companies along with their "GICS Sub Industry". For HGI, let us include the stocks of companies that are in the "Managed Health Care" Sub Industry.</p>
+<p>As I am writing this post, the "Managed Health Care" companies are:</p>
+<ul>
+<li>Humana Inc. (HUM)</li>
+<li>United Health Group Inc. (UNH)</li>
+<li>Anthem Inc. (ANTM)</li>
+<li>Aetna Inc. (AET)</li>
+<li>Cigna Corp (CI)</li>
+</ul>
+<h3>Methodology</h3>
+<p>HGI will be calculated daily based on the market capitalization of all stocks divided by a divisor.</p>
+<p>The divisor is totally made up. It allows us to report back a small number that we can wrap our head around. It also gives us an avenue to make tweaks to HGI in the future to reflect mergers, stock issues, etc.</p>
+<p>For now, lets choose <code>105,048,000</code> as our divisor. Feel free to choose another number.</p>
+<p>The mathematical formula to calculate HGI is:</p>
+<div class="highlight"><pre>total_market_capitalization / divisor
+</pre></div>
+
+
+<p>or</p>
+<div class="highlight"><pre>total_market_capitalization / 105,048,000
+</pre></div>
+
+
+<p>Note, our methodology is completely made up (though loosely based on the S&amp;P 500). Indices are calculated using a plethora of methodologies.</p>
+<h3>Let the Python Begin</h3>
+<p>For the Python portion, I will use Python 3, the awesome <a href="http://docs.python-requests.org/en/latest/">requests library</a> to make HTTP calls, and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/install.html">virtualenvwrapper</a> to create an isolated Python environment. To keep the code in this post short, we will not be writing tests. Though in real life, you should always <a href="http://docs.python-guide.org/en/latest/writing/tests/">write tests</a> for your code.</p>
+<p>Make sure you have Python 3 installed. These instructions should also work for Python 2.</p>
+<h3>Create your virtual environment</h3>
+<p>Using virtualenv, issue the following command to create a virtual environment for this project.</p>
+<p><code>mkvirtualenv -p /usr/local/bin/python3.4 venv-hgi-index</code></p>
+<p>Make sure you include the path to Python 3 on your computer. Do not assume that it is in <code>/usr/local/bin/python3.4</code> as shown above.</p>
+<p>You can check by typing <code>which python3</code> in your terminal.</p>
+<p>After issuing the <code>mkvirtualenv</code> command, your terminal should now have <code>(venv-hgi-index)</code> before the cursor.</p>
+<p>Lastly, create a folder for the project and go ahead, add a blank <code>hgi_index.py</code> file, and install the requests library using <code>pip</code>.</p>
+<p><code>mkdir ~/Documents/hgi_index</code></p>
+<p><code>cd ~/Documents/hgi_index</code></p>
+<p><code>touch hgi_index.py</code></p>
+<p><code>pip install requests</code></p>
+<h3>Coding time</h3>
+<p>We'll find the market capitalization of each stock by getting the HTML of the stock's Yahoo Finance page and parsing it to locate the market capitalization.</p>
+<p>As of this writing, the market capitalization is in a span with an <code>id</code> of  <code>yfs_j10_&lt;stock_symbol&gt;</code>.</p>
+<p>We can fetch a stocks Finance page by using the following URL.</p>
+<p><code>http://finance.yahoo.com/q?s=&lt;stock_symbol&gt;</code></p>
+<p>For Cigna (CI), this would be:</p>
+<p><code>http://finance.yahoo.com/q?s=ci</code></p>
+<p>Below is a function that takes in a stock symbol as a string and returns the current market capitalization.</p>
+<p>Type it into your <code>hgi_index.py</code> file. Be sure to read the comments in order to understand what the code is doing.</p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">def</span> <span class="nf">get_stock_market_cap</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the market capitalization for a stock symbol</span>
+<span class="sd">    :param symbol: Stock symbol (string)</span>
+<span class="sd">    :return integer of market capitalization</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Put together a URL for the stock</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://finance.yahoo.com/q?s={0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+
+    <span class="c"># Create a variable for the span that holds the market capitalization</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="s">&quot;yfs_j10_{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+    <span class="c"># Get the HTML using the requests library</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="c"># Get html string. We have to decode in order to use it in next steps</span>
+    <span class="n">html_string</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+
+    <span class="c"># For an example symbol, ci, we&#39;re looking for</span>
+    <span class="c">#   a span like: &lt;span id=&quot;yfs_j10_ci&quot;&gt;36.76B&lt;/span&gt;</span>
+
+    <span class="c"># To begin, lets find the first position of our span variable</span>
+    <span class="c">#    defined above.</span>
+
+    <span class="n">first_pos</span> <span class="o">=</span> <span class="n">html_string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+
+    <span class="c"># The first_pos index of html_string will return a &quot;y&quot;</span>
+    <span class="c"># That &quot;y&quot; is the beginning of the &quot;yfx_j10_&lt;stock_symbol&gt;&quot; span</span>
+
+    <span class="c"># Now let us find the positing of the &quot;&gt;&quot; symbol. That is the last</span>
+    <span class="c"># character before we get the number we&#39;re looking for</span>
+    <span class="n">pos_before_market_cap</span> <span class="o">=</span> <span class="n">html_string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">first_pos</span><span class="p">)</span>
+
+    <span class="c"># We know that the number we need ends before &quot;B&quot;.</span>
+    <span class="c"># All the stocks in our index are well in the billions so we</span>
+    <span class="c">#   can comfortably take this shortcut.</span>
+
+    <span class="c"># Lets find the index of the character &quot;B&quot; that occurs after the</span>
+    <span class="c"># second_post index above</span>
+
+    <span class="n">pos_after_market_cap</span> <span class="o">=</span> <span class="n">html_string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span> <span class="n">pos_before_market_cap</span><span class="p">)</span>
+
+    <span class="c"># We now have enough information to get our market cap</span>
+    <span class="n">market_cap</span> <span class="o">=</span> <span class="n">html_string</span><span class="p">[</span><span class="n">pos_before_market_cap</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="n">pos_after_market_cap</span><span class="p">]</span>
+
+    <span class="c"># Now lets turn this into a float and multiply by a billion</span>
+    <span class="n">market_cap</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">market_cap</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000000000</span>
+
+    <span class="c"># Lastly, lets return the market cap as an integer</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">market_cap</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Here is the accompanying function that calculates the index. Add this to the <code>hgi_index.py</code> file as well.</p>
+<div class="highlight"><pre><span class="n">requests</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">def</span> <span class="nf">calculate_hgi_index</span><span class="p">():</span>
+    <span class="c"># List of all the stocks</span>
+    <span class="n">stocks</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;HUM&#39;</span><span class="p">,</span> <span class="s">&#39;UNH&#39;</span><span class="p">,</span> <span class="s">&#39;ANTM&#39;</span><span class="p">,</span> <span class="s">&#39;AET&#39;</span><span class="p">,</span> <span class="s">&#39;CI&#39;</span><span class="p">]</span>
+
+    <span class="c"># Our made up divisor</span>
+    <span class="n">special_divisor</span> <span class="o">=</span> <span class="mi">105048000</span>
+
+    <span class="c"># Initialize market cap variable to zero</span>
+    <span class="n">total_market_cap</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">stock</span> <span class="ow">in</span> <span class="n">stocks</span><span class="p">:</span>
+        <span class="c"># Get market cap for current stock</span>
+        <span class="n">market_cap</span> <span class="o">=</span> <span class="n">get_stock_market_cap</span><span class="p">(</span><span class="n">stock</span><span class="p">)</span>
+
+        <span class="c"># add market_cap to the total_market_cap variable</span>
+        <span class="n">total_market_cap</span> <span class="o">+=</span> <span class="n">market_cap</span>
+
+    <span class="c"># divide by special_divisor to get index</span>
+    <span class="n">hgi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_market_cap</span> <span class="o">/</span> <span class="n">special_divisor</span><span class="p">)</span>
+
+    <span class="c"># Create message</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;%a %b </span><span class="si">%d</span><span class="s"> %Y %H:%M&#39;</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;HGI Index for {0} is {1}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">today</span><span class="p">,</span> <span class="n">hgi</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Run the code</h3>
+<p>To run the code, add the following at the end of the file and save.</p>
+<div class="highlight"><pre>if __name__ == &#39;__main__&#39;:
+    calculate_hgi_index()
+</pre></div>
+
+
+<p>In the terminal, navigate to the directory where you saved your <code>hgi_index.py</code> file.</p>
+<p>Run the file by typing <code>python3 hgi_index.py</code></p>
+<p>In my case, the result is:</p>
+<div class="highlight"><pre>HGI Index for Fri Sep 18 2015 00:56 is 2500.
+</pre></div>
+
+
+<p>The result will obviously differ based on when you run your file. You can find the code by following <a href="https://gist.github.com/dikee/8cc54dc95b41532eb473">this link</a>.</p>
+<p>I hope you enjoyed the post. Feel free to contact me if you have any questions.</p>
+    </div>
+  </div>
+  <hr class="separator">
+  <div class="col-md-8 col-md-offset-2">
+  </div>
+  </div>
+<footer class="footer">
+  <div class="container">
+    <p class="text-center">
+      Dike E. Kalu, <a href="" target="_blank"></a> unless otherwise noted.
+    </p>
+    <div class="text-center">
+      Generated by <a href="http://getpelican.com" target="_blank">Pelican</a> with the <a href="http://github.com/nairobilug/pelican-alchemy">alchemy</a> theme.
+    </div>
+  </div>
+</footer> <!-- /.footer -->
+  <script src="http://dikekalu.com/theme/js/jquery.min.js"></script>
+  <script src="http://dikekalu.com/theme/js/bootstrap.min.js"></script>
+</body> <!-- 42 -->
+
+</html>
